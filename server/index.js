@@ -1,4 +1,4 @@
-const path = require('path');  // Tilføj denne linje
+const path = require('path');  // Add this line
 const express = require('express');
 const cors = require('cors');
 const http = require('http');
@@ -9,8 +9,8 @@ const app = express();
 // Fix mongoose deprecation warning
 mongoose.set('strictQuery', true);
 
-app.set('view engine','ejs')
-app.use(express.static('public'))
+app.set('view engine', 'ejs');
+app.use(express.static('public')); // Serving static files from 'public' folder
 
 // Let environment assign the port
 const PORT = process.env.PORT || 8182;
@@ -27,7 +27,7 @@ app.use('/api/auth', require('./routes/auth'));
 
 // Serve the React app instead of Hello World
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../build/index.html'));
+    res.sendFile(path.join(__dirname, '../public/index.html'));  // Updated path
 });
 
 // Start the server
