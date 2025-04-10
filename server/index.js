@@ -12,7 +12,7 @@ app.set('view engine','ejs')
 app.use(express.static('public'))
 
 // Let environment assign the port
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(express.json());
