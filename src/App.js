@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 // Import custom components
 import Navbar from './Components/Navbar/Navbar';
-import Landing_page from './Components/Landing_Page/Landing_page';
+import Landing_page from './Components/Landing_Page/Landing_Page';
 import './App.css';
 
 // Function component for the main App
@@ -16,7 +16,7 @@ function App() {
       <BrowserRouter>
         <Navbar />
         <Routes>
-          <Route path="/" element={<Landing_page />} />
+          <Route path="/" element={<Landing_Page />} />
         </Routes>
       </BrowserRouter>
     </div>
