@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Sign_Up.css';
+import { API_URL } from '../../config';
+
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -21,11 +23,10 @@ const SignUp = () => {
     }
 
     // Phone validation (10 digits)
-    if (!formData.phone) {
-        newErrors.phone = 'Phone number is required';
-      } else if (!/^\d{10}$/.test(formData.phone.replace(/\D/g, ''))) {
-        newErrors.phone = 'Phone number must be exactly 10 digits';
-      }
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(formData.phone)) {
+      newErrors.phone = 'Phone number must be 10 digits';
+    }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -50,13 +51,46 @@ const SignUp = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      console.log('Form submitted:', formData);
-      navigate('/login');
+      try {
+        const response = await fetch(`${API_URL}/api/auth/register`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            password: formData.password,
+            phone: formData.phone,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          sessionStorage.setItem("auth-token", data.token);
+          sessionStorage.setItem("name", formData.name);
+          sessionStorage.setItem("phone", formData.phone);
+          sessionStorage.setItem("email", formData.email);
+          navigate("/");
+        } else {
+          setErrors(prevErrors => ({
+            ...prevErrors,
+            server: data.message || 'Registration failed'
+          }));
+        }
+      } catch (error) {
+        setErrors(prevErrors => ({
+          ...prevErrors,
+          server: 'Server error occurred'
+        }));
+      }
     }
   };
+
 
   return (
     <div className="container" style={{ marginTop: '5%' }}>
@@ -67,6 +101,11 @@ const SignUp = () => {
         <div className="signup-text1" style={{ textAlign: 'left' }}>
           Already a member? <span><Link to="/login" style={{ color: '#2190FF' }}>Login</Link></span>
         </div>
+        {errors.server && (
+          <div className="error-message" style={{ color: 'red', textAlign: 'center', marginBottom: '1rem' }}>
+            {errors.server}
+          </div>
+        )}
         <div className="signup-form">
           <form onSubmit={handleSubmit}>
             <div className="form-group">
