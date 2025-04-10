@@ -40,12 +40,8 @@ function Navbar() {
         </li>
         
         <li className="link">
-   <Link to="/instant-consultation">
-    <button className="btn1">Instant Consultation</button>
-  </Link>
+           <Link to="/InstantConsultation">Instant Consultation</Link>
 </li>
-// ... existing code ...
-
 
         {!authToken ? (
           <>

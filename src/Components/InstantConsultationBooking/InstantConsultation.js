@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './InstantConsultation.css';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import FindDoctorSearchIC from './FindDoctorSearchIC/FindDoctorSearchIC';
 import DoctorCardIC from './DoctorCardIC/DoctorCardIC';
 
@@ -15,13 +15,9 @@ const InstantConsultation = () => {
         .then(res => res.json())
         .then(data => {
             if (searchParams.get('speciality')) {
-                // window.reload()
                 const filtered = data.filter(doctor => doctor.speciality.toLowerCase() === searchParams.get('speciality').toLowerCase());
-
                 setFilteredDoctors(filtered);
-                
                 setIsSearched(true);
-                window.reload()
             } else {
                 setFilteredDoctors([]);
                 setIsSearched(false);
@@ -30,56 +26,46 @@ const InstantConsultation = () => {
         })
         .catch(err => console.log(err));
     }
-    const handleSearch = (searchText) => {
 
+    const handleSearch = (searchText) => {
         if (searchText === '') {
             setFilteredDoctors([]);
             setIsSearched(false);
-            } else {
-                
+        } else {
             const filtered = doctors.filter(
-                (doctor) =>
-                // 
-                doctor.speciality.toLowerCase().includes(searchText.toLowerCase())
-                
+                (doctor) => doctor.speciality.toLowerCase().includes(searchText.toLowerCase())
             );
-                
             setFilteredDoctors(filtered);
             setIsSearched(true);
-            window.location.reload()
         }
     };
-    const navigate = useNavigate();
+
     useEffect(() => {
         getDoctorsDetails();
-        // const authtoken = sessionStorage.getItem("auth-token");
-        // if (!authtoken) {
-        //     navigate("/login");
-        // }
-    }, [searchParams])
+    }, [searchParams, getDoctorsDetails]);
 
     return (
         <center>
-            <div  className="searchpage-container">
-            <FindDoctorSearchIC onSearch={handleSearch} />
-            <div className="search-results-container">
-            {isSearched ? (
-                <center>
-                    <h2>{filteredDoctors.length} doctors are available {searchParams.get('location')}</h2>
-                    <h3>Book appointments with minimum wait-time & verified doctor details</h3>
-                    {filteredDoctors.length > 0 ? (
-                    filteredDoctors.map(doctor => <DoctorCardIC className="doctorcard" {...doctor} key={doctor.name} />)
+            <div className="searchpage-container">
+                <FindDoctorSearchIC onSearch={handleSearch} />
+                <div className="search-results-container">
+                    {isSearched ? (
+                        <center>
+                            <h2>{filteredDoctors.length} doctors are available {searchParams.get('location')}</h2>
+                            <h3>Book appointments with minimum wait-time & verified doctor details</h3>
+                            {filteredDoctors.length > 0 ? (
+                                filteredDoctors.map(doctor => <DoctorCardIC className="doctorcard" {...doctor} key={doctor.name} />)
+                            ) : (
+                                <p>No doctors found.</p>
+                            )}
+                        </center>
                     ) : (
-                    <p>No doctors found.</p>
+                        ''
                     )}
-                </center>
-                ) : (
-                ''
-                )}
+                </div>
             </div>
-        </div>
         </center>
-    )
+    );
 }
 
-export default InstantConsultation
+export default InstantConsultation;
