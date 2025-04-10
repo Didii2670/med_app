@@ -37,7 +37,7 @@ function Navbar() {
           <Link to="/appointments">Appointments</Link>
         </li>
         <li className="link">
-          <Link to="/signup">
+          <Link to="/Sign_Up">
             <button className="btn1">Sign Up</button>
           </Link>
         </li>

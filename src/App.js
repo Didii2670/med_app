@@ -14,18 +14,17 @@ import './App.css';
 
 // Function component for the main App
 function App() {
-  return (
-    <div className="App">
-      <BrowserRouter>
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Landing_Page />} />
-          <Route path="/login" element={<Login />} />
-        <Route path="/Sign_Up" element={<SignUp />} />
-        </Routes>
-      </BrowserRouter>
-    </div>
-  );
-}
-
+    return (
+      <div className="App">
+        <BrowserRouter>
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<Landing_Page />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/Sign_Up" element={<SignUp />} />
+          </Routes>
+        </BrowserRouter>
+      </div>
+    );
+  }
 export default App;

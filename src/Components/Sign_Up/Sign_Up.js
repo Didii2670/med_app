@@ -21,10 +21,11 @@ const SignUp = () => {
     }
 
     // Phone validation (10 digits)
-    const phoneRegex = /^\d{10}$/;
-    if (!phoneRegex.test(formData.phone)) {
-      newErrors.phone = 'Phone number must be 10 digits';
-    }
+    if (!formData.phone) {
+        newErrors.phone = 'Phone number is required';
+      } else if (!/^\d{10}$/.test(formData.phone.replace(/\D/g, ''))) {
+        newErrors.phone = 'Phone number must be exactly 10 digits';
+      }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
