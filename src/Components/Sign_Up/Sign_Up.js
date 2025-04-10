@@ -1,189 +1,78 @@
+// Following code has been commented with appropriate comments for your reference.
 import React, { useState } from 'react';
+import './Sign_Up.css'
 import { Link, useNavigate } from 'react-router-dom';
-import './Sign_Up.css';
 import { API_URL } from '../../config';
 
+// Function component for Sign Up form
+const Sign_Up = () => {
+    // State variables using useState hook
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [phone, setPhone] = useState('');
+    const [password, setPassword] = useState('');
+    const [showerr, setShowerr] = useState(''); // State to show error messages
+    const navigate = useNavigate(); // Navigation hook from react-router
 
-const SignUp = () => {
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    password: ''
-  });
-  const [errors, setErrors] = useState({});
+    // Function to handle form submission
+    const register = async (e) => {
+        e.preventDefault(); // Prevent default form submission
 
-  const validateForm = () => {
-    const newErrors = {};
-    
-    // Name validation
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
-    }
-
-    // Phone validation (10 digits)
-    const phoneRegex = /^\d{10}$/;
-    if (!phoneRegex.test(formData.phone)) {
-      newErrors.phone = 'Phone number must be 10 digits';
-    }
-
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      newErrors.email = 'Invalid email address';
-    }
-
-    // Password validation
-    if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prevState => ({
-      ...prevState,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (validateForm()) {
-      try {
+        // API Call to register user
         const response = await fetch(`${API_URL}/api/auth/register`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: formData.name,
-            email: formData.email,
-            password: formData.password,
-            phone: formData.phone,
-          }),
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                name: name,
+                email: email,
+                password: password,
+                phone: phone,
+            }),
         });
 
-        const data = await response.json();
+        const json = await response.json(); // Parse the response JSON
 
-        if (data.success) {
-          sessionStorage.setItem("auth-token", data.token);
-          sessionStorage.setItem("name", formData.name);
-          sessionStorage.setItem("phone", formData.phone);
-          sessionStorage.setItem("email", formData.email);
-          navigate("/");
+        if (json.authtoken) {
+            // Store user data in session storage
+            sessionStorage.setItem("auth-token", json.authtoken);
+            sessionStorage.setItem("name", name);
+            sessionStorage.setItem("phone", phone);
+            sessionStorage.setItem("email", email);
+
+            // Redirect user to home page
+            navigate("/");
+            window.location.reload(); // Refresh the page
         } else {
-          setErrors(prevErrors => ({
-            ...prevErrors,
-            server: data.message || 'Registration failed'
-          }));
+            if (json.errors) {
+                for (const error of json.errors) {
+                    setShowerr(error.msg); // Show error messages
+                }
+            } else {
+                setShowerr(json.error);
+            }
         }
-      } catch (error) {
-        setErrors(prevErrors => ({
-          ...prevErrors,
-          server: 'Server error occurred'
-        }));
-      }
-    }
-  };
+    };
 
-
-  return (
-    <div className="container" style={{ marginTop: '5%' }}>
-      <div className="signup-grid">
-        <div className="signup-text">
-          <h1>Sign Up</h1>
+    // JSX to render the Sign Up form
+    return (
+        <div className="container" style={{marginTop:'5%'}}>
+            <div className="signup-grid">
+                <div className="signup-form">
+                    <form method="POST" onSubmit={register}>
+                        <div className="form-group">
+                            <label htmlFor="email">Email</label>
+                            <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" name="email" id="email" className="form-control" placeholder="Enter your email" aria-describedby="helpId" />
+                            {showerr && <div className="err" style={{ color: 'red' }}>{showerr}</div>}
+                        </div>
+                        {/* Apply similar logic for other form elements like name, phone, and password to capture user information */}
+                    </form>
+                </div>
+            </div>
         </div>
-        <div className="signup-text1" style={{ textAlign: 'left' }}>
-          Already a member? <span><Link to="/login" style={{ color: '#2190FF' }}>Login</Link></span>
-        </div>
-        {errors.server && (
-          <div className="error-message" style={{ color: 'red', textAlign: 'center', marginBottom: '1rem' }}>
-            {errors.server}
-          </div>
-        )}
-        <div className="signup-form">
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label htmlFor="name">Name</label>
-              <input
-                type="text"
-                name="name"
-                id="name"
-                className={`form-control ${errors.name ? 'is-invalid' : ''}`}
-                placeholder="Enter your name"
-                value={formData.name}
-                onChange={handleChange}
-              />
-              {errors.name && <div className="error-message">{errors.name}</div>}
-            </div>
+        {/* Note: Sign up role is not stored in the database. Additional logic can be implemented for this based on your React code. */}
+    );
+}
 
-            <div className="form-group">
-              <label htmlFor="phone">Phone</label>
-              <input
-                type="tel"
-                name="phone"
-                id="phone"
-                className={`form-control ${errors.phone ? 'is-invalid' : ''}`}
-                placeholder="Enter your phone number"
-                value={formData.phone}
-                onChange={handleChange}
-              />
-              {errors.phone && <div className="error-message">{errors.phone}</div>}
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="email">Email</label>
-              <input
-                type="email"
-                name="email"
-                id="email"
-                className={`form-control ${errors.email ? 'is-invalid' : ''}`}
-                placeholder="Enter your email"
-                value={formData.email}
-                onChange={handleChange}
-              />
-              {errors.email && <div className="error-message">{errors.email}</div>}
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="password">Password</label>
-              <input
-                type="password"
-                name="password"
-                id="password"
-                className={`form-control ${errors.password ? 'is-invalid' : ''}`}
-                placeholder="Enter your password"
-                value={formData.password}
-                onChange={handleChange}
-              />
-              {errors.password && <div className="error-message">{errors.password}</div>}
-            </div>
-
-            <div className="btn-group">
-              <button type="submit" className="btn btn-primary mb-2 mr-1 waves-effect waves-light">
-                Submit
-              </button>
-              <button 
-                type="reset" 
-                className="btn btn-danger mb-2 waves-effect waves-light"
-                onClick={() => {
-                  setFormData({ name: '', phone: '', email: '', password: '' });
-                  setErrors({});
-                }}
-              >
-                Reset
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default SignUp;
+export default Sign_Up; // Export the Sign_Up component for use in other components                                                                                     
